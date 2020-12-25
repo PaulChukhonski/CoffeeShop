@@ -9,16 +9,19 @@ using namespace std;
 void showMainMenu(double userBalance);
 void showCoffeeMenu(double userBalance);
 void showAdminMenu();
-void pause();
+void pauseConsole();
 void showUserBalance(double userBalance);
 
 int getChoice();
 void showIncorrectChoiceMessage(int num);
 
+double depositeMoney(double userBalance);
+bool isDepositedMoneyCorrect(double depositedMoney);
+
 int main()
 {
 	int cups = 7, pin = 0, menuChoice, coffeeChoice, adminChoice; 
-	double userBalance = 0.0, shopBalance = 0.0;
+	double userBalance = 0.0, depositedMoney = 0.0, shopBalance = 0.0;
 	bool mainMenu = true, coffeeMenu, adminMenu;
 	
 	while(mainMenu)
@@ -29,7 +32,17 @@ int main()
 		switch(menuChoice)
 		{
 			case 1:
-				break;
+                depositedMoney = depositeMoney(depositedMoney);
+
+                while(!isDepositedMoneyCorrect(depositedMoney)) {
+                    cout << "Deposited money cannot be less or equal to 0." << endl;
+
+                    depositedMoney = depositeMoney(depositedMoney);
+                }
+
+                userBalance += depositedMoney;
+
+                break;
 			case 2:
 				coffeeMenu = true;
 					
@@ -137,7 +150,7 @@ void showAdminMenu()
 	cout << "--------------------------------" << endl;			
 }
 
-void pause()
+void pauseConsole()
 {
 	do 
 	{
@@ -164,4 +177,19 @@ void showIncorrectChoiceMessage(int num)
 {
 	cout << "Incorrect input. Enter number 1..." << num << "!" << endl;
 	pause();
+}
+
+double depositeMoney(double sum)
+{
+    cout << "Deposit money: ";
+    cin >> sum;
+
+    return sum;
+}
+
+bool isDepositedMoneyCorrect(double depositedMoney)
+{
+    if(depositedMoney <= 0) {
+        return false;
+    } return true;
 }

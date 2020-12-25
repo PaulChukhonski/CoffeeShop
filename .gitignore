@@ -3,3 +3,5 @@
 *.txt
 .idea
 .Debug
+.CMakeLists.txt
+/cmake-build-debug/
