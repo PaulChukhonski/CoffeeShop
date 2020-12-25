@@ -6,6 +6,10 @@ using namespace std;
 #define ADMIN_CASES_NUM 5
 #define ENTER 13
 
+#define ESPRESSO_PRICE 2.50
+#define CAPPUCCINO_PRICE 1.60
+#define LATTE_PRICE 3.10
+
 void showMainMenu(double userBalance);
 void showCoffeeMenu(double userBalance);
 void showAdminMenu();
@@ -17,6 +21,8 @@ void showIncorrectChoiceMessage(int num);
 
 double depositeMoney(double userBalance);
 bool isDepositedMoneyCorrect(double depositedMoney);
+
+bool isEnoughMoneyToBuy(double userBalance, double coffeePrice);
 
 int main()
 {
@@ -54,11 +60,52 @@ int main()
 					switch(coffeeChoice)
 					{
 						case 1:
+						    if(cups <= 0)
+                            {
+                                cout << "Sorry we don't have cups. Contact service, please." << endl;
+                            } else if(isEnoughMoneyToBuy(userBalance, ESPRESSO_PRICE))
+                            {
+                                userBalance -= ESPRESSO_PRICE;
+                                shopBalance += ESPRESSO_PRICE;
+                                cups--;
+                                cout << "Take your ESPRESSO!" << endl;
+                            } else
+                            {
+                                cout << "Not enough money! Your balance: " << userBalance << ". Coffee price: " << ESPRESSO_PRICE << "." << endl;
+                                cout << "To buy, you need to deposit " << ESPRESSO_PRICE - userBalance << " BYN more" << endl;
+                            }
 							break;
 						case 2:
-			
-							break;
+                            if(cups <= 0)
+                            {
+                                cout << "Sorry we don't have cups. Contact service, please." << endl;
+                            } else if(isEnoughMoneyToBuy(userBalance, CAPPUCCINO_PRICE))
+                            {
+                                userBalance -= CAPPUCCINO_PRICE;
+                                shopBalance += CAPPUCCINO_PRICE;
+                                cups--;
+                                cout << "Take your CAPPUCCINO!" << endl;
+                            } else
+                            {
+                                cout << "Not enough money! Your balance: " << userBalance << ". Coffee price: " << CAPPUCCINO_PRICE << "." << endl;
+                                cout << "To buy, you need to deposit " << CAPPUCCINO_PRICE - userBalance << " BYN more" << endl;
+                            }
+                            break;
 						case 3:
+                            if(cups <= 0)
+                            {
+                                cout << "Sorry we don't have cups. Contact service, please." << endl;
+                            } else if(isEnoughMoneyToBuy(userBalance, LATTE_PRICE))
+                            {
+                                userBalance -= LATTE_PRICE;
+                                shopBalance += LATTE_PRICE;
+                                cups--;
+                                cout << "Take your LATTE!" << endl;
+                            } else
+                            {
+                                cout << "Not enough money! Your balance: " << userBalance << ". Coffee price: " << LATTE_PRICE << "." << endl;
+                                cout << "To buy, you need to deposit " << LATTE_PRICE - userBalance << " BYN more" << endl;
+                            }
 							break;
 						case 4:
 							coffeeMenu = false;
@@ -190,6 +237,13 @@ double depositeMoney(double sum)
 bool isDepositedMoneyCorrect(double depositedMoney)
 {
     if(depositedMoney <= 0) {
+        return false;
+    } return true;
+}
+
+bool isEnoughMoneyToBuy(double userBalance, double coffeePrice)
+{
+    if (coffeePrice > userBalance) {
         return false;
     } return true;
 }
