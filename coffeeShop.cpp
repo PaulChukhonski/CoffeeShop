@@ -10,6 +10,8 @@ using namespace std;
 #define CAPPUCCINO_PRICE 1.60
 #define LATTE_PRICE 3.10
 
+#define PIN 1234
+
 void showMainMenu(double userBalance);
 void showCoffeeMenu(double userBalance);
 void showAdminMenu();
@@ -24,9 +26,15 @@ bool isDepositedMoneyCorrect(double depositedMoney);
 
 bool isEnoughMoneyToBuy(double userBalance, double coffeePrice);
 
+int inputPIN(int pin);
+bool isPinValid(int pin);
+
+int addCups(int addedCups);
+bool isNumberAddedCupsCorrect(int addedCups);
+
 int main()
 {
-	int cups = 7, pin = 0, menuChoice, coffeeChoice, adminChoice; 
+	int cups = 7, addedCups = 0, pin = 0, countPinInput = 0, menuChoice, coffeeChoice, adminChoice;
 	double userBalance = 0.0, depositedMoney = 0.0, shopBalance = 0.0;
 	bool mainMenu = true, coffeeMenu, adminMenu;
 	
@@ -38,15 +46,20 @@ int main()
 		switch(menuChoice)
 		{
 			case 1:
-                depositedMoney = depositeMoney(depositedMoney);
-
-                while(!isDepositedMoneyCorrect(depositedMoney)) {
-                    cout << "Deposited money cannot be less or equal to 0." << endl;
-
+                if(cups <= 0) {
+                    cout << "Sorry we don't have cups. Contact service, please." << endl;
+                } else {
                     depositedMoney = depositeMoney(depositedMoney);
-                }
 
-                userBalance += depositedMoney;
+                    while (!isDepositedMoneyCorrect(depositedMoney)) {
+                        cout << "Deposited money cannot be less or equal to 0." << endl;
+
+                        depositedMoney = depositeMoney(depositedMoney);
+                    }
+
+                    userBalance += depositedMoney;
+                    shopBalance += depositedMoney;
+                }
 
                 break;
 			case 2:
@@ -66,7 +79,6 @@ int main()
                             } else if(isEnoughMoneyToBuy(userBalance, ESPRESSO_PRICE))
                             {
                                 userBalance -= ESPRESSO_PRICE;
-                                shopBalance += ESPRESSO_PRICE;
                                 cups--;
                                 cout << "Take your ESPRESSO!" << endl;
                             } else
@@ -82,7 +94,6 @@ int main()
                             } else if(isEnoughMoneyToBuy(userBalance, CAPPUCCINO_PRICE))
                             {
                                 userBalance -= CAPPUCCINO_PRICE;
-                                shopBalance += CAPPUCCINO_PRICE;
                                 cups--;
                                 cout << "Take your CAPPUCCINO!" << endl;
                             } else
@@ -98,7 +109,6 @@ int main()
                             } else if(isEnoughMoneyToBuy(userBalance, LATTE_PRICE))
                             {
                                 userBalance -= LATTE_PRICE;
-                                shopBalance += LATTE_PRICE;
                                 cups--;
                                 cout << "Take your LATTE!" << endl;
                             } else
@@ -117,8 +127,21 @@ int main()
 				}
 				break;
 			case 3:
-				adminMenu = true;
-				
+				pin = inputPIN(pin);
+                adminMenu = isPinValid(pin);
+
+                if(!adminMenu && countPinInput < 2)
+                {
+                    cout << "PIN isn't correct!" << endl;
+                    countPinInput++;
+                    cout << "You have " << 2 - countPinInput << " attempts." << endl;
+                }
+                if (countPinInput >= 2)
+                {
+                    cout << "Coffee Shop is locked. Contact service, please." << endl;
+                    return 0;
+                }
+
 				while(adminMenu)
 				{
 					showAdminMenu();
@@ -127,13 +150,24 @@ int main()
 					switch(adminChoice)
 					{
 						case 1:
+						    cout << "Coffee shop balance: " << shopBalance << endl;
 							break;
 						case 2:
-			
+                            cout << "Current number of cups: " << cups << endl;
 							break;
 						case 3:
+						    cout << shopBalance << " BYN was received." << endl;
+                            shopBalance = 0;
 							break;
 						case 4:
+                            addedCups = addCups(addedCups);
+
+                            if(!isNumberAddedCupsCorrect(addedCups))
+                            {
+                                cout << "Added number of cups must be more than 0" << endl;
+                                break;
+                            } else cups += addedCups;
+
 							break;
 						case 5:
 							adminMenu = false;
@@ -244,6 +278,37 @@ bool isDepositedMoneyCorrect(double depositedMoney)
 bool isEnoughMoneyToBuy(double userBalance, double coffeePrice)
 {
     if (coffeePrice > userBalance) {
+        return false;
+    } return true;
+}
+
+int inputPIN(int pin)
+{
+    cout << "Input PIN to enter service panel: ";
+    cin >> pin;
+
+    return pin;
+}
+
+bool isPinValid(int pin)
+{
+    if(pin == PIN)
+    {
+        return true;
+    } return false;
+}
+
+int addCups(int addedCups)
+{
+    cout << "How many cups do want to add?: ";
+    cin >> addedCups;
+
+    return addedCups;
+}
+
+bool isNumberAddedCupsCorrect(int addedCups)
+{
+    if (addedCups <= 0) {
         return false;
     } return true;
 }
