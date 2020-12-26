@@ -212,6 +212,7 @@ void showMainMenu(double userBalance)
 {
 	system("cls");
 	cout << "Welcome to CoffeeShop!" << endl;
+	cout << "The machine doesn't give change!" << endl;
 	cout << "------------------------" << endl;	
 	showUserBalance(userBalance);		
 	cout << "------------------------" << endl;	
@@ -401,10 +402,10 @@ void showErrorMessage(int errorNum)
 			pauseConsole();
 			break;	
 		case 2:	
-			cout << "Deposited money cannot be less than 1." << endl;
+			cout << "Deposited money can't be less than 1." << endl;
 			break;
 		case 3:	
-			cout << "Added number of cups cannot be less or equal to 0." << endl;
+			cout << "Added number of cups can't be less or equal to 0." << endl;
 			break;
 		case 4:	
 			cout << "Coffee Shop is locked. Contact service, please." << endl;
