@@ -1,6 +1,6 @@
 #include <iostream>
 #include <conio.h>
-#include<windows.h>
+#include <windows.h>
 using namespace std;
 #define MENU_CASES_NUM 4
 #define COFFEE_CASES_NUM 4
@@ -21,6 +21,9 @@ void showCoffeeMenu(double userBalance);
 void showAdminMenu();
 void pauseConsole();
 void showUserBalance(double userBalance);
+void showShopBalance(double shopBalance);
+void showCupsNumber(int cups);
+void showWithdrawMoneyMessage(double shopBalance);
 
 int getChoice();
 void showIncorrectChoiceMessage(int num);
@@ -29,6 +32,7 @@ double depositeMoney(double userBalance);
 bool isDepositedMoneyCorrect(double depositedMoney);
 
 bool isEnoughMoneyToBuy(double userBalance, double coffeePrice);
+double buyCoffee(double userBalance, double price);
 
 int inputPIN(int pin);
 bool isPinValid(int pin);
@@ -39,10 +43,9 @@ bool isNumberAddedCupsCorrect(int addedCups);
 void showProgressBar();
 void showCursor(bool showCursor);
 
-void showNoCupsMessage(int cups);
 void showNotEnoughMoneyToBuyMessage(double userBalance, double price);
-void showShopBalance(double shopBalance);
-void showCupsNumber(int cups);
+void showIncorrectPinMessage(int countPinInput);
+void showErrorMessage(int errorNum);
 
 int main()
 {
@@ -59,13 +62,12 @@ int main()
 		{
 			case 1:
                 if(cups <= 0) {
-                    showNoCupsMessage(cups);
+                    showErrorMessage(1);
                 } else {
                     depositedMoney = depositeMoney(depositedMoney);
 
                     while (!isDepositedMoneyCorrect(depositedMoney)) {
-                        cout << "Deposited money cannot be less or equal to 0." << endl;
-
+                        showErrorMessage(2);
                         depositedMoney = depositeMoney(depositedMoney);
                     }
 
@@ -86,11 +88,11 @@ int main()
 						case 1:
 						    if(cups <= 0)
                             {
-                                showNoCupsMessage(cups);
+                                showErrorMessage(1);
                             } else if(isEnoughMoneyToBuy(userBalance, ESPRESSO_PRICE))
                             {
                             	showProgressBar();
-                                userBalance -= ESPRESSO_PRICE;
+                                userBalance = buyCoffee(userBalance, ESPRESSO_PRICE);
                                 cups--;
                             } else
                             {
@@ -100,11 +102,11 @@ int main()
 						case 2:
                             if(cups <= 0)
                             {
-                                showNoCupsMessage(cups);
+                                showErrorMessage(1);
                             } else if(isEnoughMoneyToBuy(userBalance, CAPPUCCINO_PRICE))
                             {
                             	showProgressBar();
-                                userBalance -= CAPPUCCINO_PRICE;
+                                userBalance = buyCoffee(userBalance, CAPPUCCINO_PRICE);
                                 cups--;
                             } else
                             {
@@ -114,11 +116,11 @@ int main()
 						case 3:
                             if(cups <= 0)
                             {
-                                showNoCupsMessage(cups);
+                                showErrorMessage(1);
                             } else if(isEnoughMoneyToBuy(userBalance, LATTE_PRICE))
                             {
                             	showProgressBar();
-                                userBalance -= LATTE_PRICE;
+                                userBalance = buyCoffee(userBalance, LATTE_PRICE);
                                 cups--;
                             } else
                             {
@@ -138,18 +140,18 @@ int main()
 				pin = inputPIN(pin);
                 adminMenu = isPinValid(pin);
 
-                if(!adminMenu && countPinInput < MAX_COUNT_PIN_INPUT)
+                if(!adminMenu)
                 {
-                    cout << "PIN isn't correct!" << endl;
-                    countPinInput++;
-                    cout << "You have " << MAX_COUNT_PIN_INPUT - countPinInput << " attempts." << endl;
+                	countPinInput++;
+                    if (countPinInput >= MAX_COUNT_PIN_INPUT)
+                    {
+                    	showIncorrectPinMessage(countPinInput);
+                        showErrorMessage(4);
+                        return 0;
+                    }
+					
+					showIncorrectPinMessage(countPinInput);       
                     pauseConsole();
-                }
-                if (countPinInput >= MAX_COUNT_PIN_INPUT)
-                {
-                    cout << "Coffee Shop is locked. Contact service, please." << endl;
-                    pauseConsole();
-                    return 0;
                 }
 
 				while(adminMenu)
@@ -166,19 +168,24 @@ int main()
                             showCupsNumber(cups);
 							break;
 						case 3:
-						    cout << shopBalance << " BYN was received." << endl;
-                            shopBalance = 0;
-                            pauseConsole();
+						    if(shopBalance == 0) {
+						        showErrorMessage(5);
+						    } else {
+                                showWithdrawMoneyMessage(shopBalance);
+                                shopBalance = 0;
+                                userBalance = 0;
+                            }
 							break;
 						case 4:
                             addedCups = addCups(addedCups);
 
-                            if(!isNumberAddedCupsCorrect(addedCups))
+                            while(!isNumberAddedCupsCorrect(addedCups))
                             {
-                                cout << "Added number of cups must be more than 0" << endl;
-                                break;
-                            } else cups += addedCups;
+                            	showErrorMessage(3);
+                                addedCups = addCups(addedCups);
+                            }
 
+                            cups += addedCups;
 							break;
 						case 5:
 							adminMenu = false;
@@ -255,6 +262,24 @@ void showUserBalance(double userBalance)
 	cout << "Current balance: " << userBalance << " BYN" << endl;
 }
 
+void showShopBalance(double shopBalance)
+{
+	cout << "Coffee shop balance: " << shopBalance << " BYN" << endl;
+	pauseConsole();
+}
+
+void showCupsNumber(int cups)
+{
+	cout << "Current number of cups: " << cups << endl;
+	pauseConsole();
+}
+
+void showWithdrawMoneyMessage(double shopBalance)
+{
+	cout << shopBalance << " BYN was received." << endl;
+	pauseConsole();	
+}
+
 int getChoice()
 {
 	int choice;
@@ -281,7 +306,7 @@ double depositeMoney(double sum)
 
 bool isDepositedMoneyCorrect(double depositedMoney)
 {
-    if(depositedMoney <= 0) {
+    if(depositedMoney < 1) {
         return false;
     } return true;
 }
@@ -291,6 +316,11 @@ bool isEnoughMoneyToBuy(double userBalance, double coffeePrice)
     if (coffeePrice > userBalance) {
         return false;
     } return true;
+}
+
+double buyCoffee(double userBalance, double price)
+{
+    return userBalance - price;
 }
 
 int inputPIN(int pin)
@@ -311,7 +341,7 @@ bool isPinValid(int pin)
 
 int addCups(int addedCups)
 {
-    cout << "How many cups do want to add?: ";
+    cout << "How many cups do want to add? ";
     cin >> addedCups;
 
     return addedCups;
@@ -350,12 +380,6 @@ void showCursor(bool visible)
 	SetConsoleCursorInfo( handle, &structCursorInfo );	
 }
 
-void showNoCupsMessage(int cups)
-{
-	cout << "Sorry we don't have cups. Contact service, please." << endl;
-	pauseConsole();
-}
-
 void showNotEnoughMoneyToBuyMessage(double userBalance, double price)
 {
     cout << "Not enough money to buy coffee!" << endl;
@@ -363,14 +387,31 @@ void showNotEnoughMoneyToBuyMessage(double userBalance, double price)
 	pauseConsole();   
 }
 
-void showShopBalance(double shopBalance)
+void showIncorrectPinMessage(int countPinInput)
 {
-	cout << "Coffee shop balance: " << shopBalance << " BYN" << endl;
-	pauseConsole();
+	cout << "PIN isn't correct! You have " << MAX_COUNT_PIN_INPUT - countPinInput << " attempts." << endl;
 }
 
-void showCupsNumber(int cups)
+void showErrorMessage(int errorNum)
 {
-	cout << "Current number of cups: " << cups << endl;
-	pauseConsole();
+	switch(errorNum)
+	{
+		case 1:
+			cout << "Sorry we don't have cups. Contact service, please." << endl;
+			pauseConsole();
+			break;	
+		case 2:	
+			cout << "Deposited money cannot be less than 1." << endl;
+			break;
+		case 3:	
+			cout << "Added number of cups cannot be less or equal to 0." << endl;
+			break;
+		case 4:	
+			cout << "Coffee Shop is locked. Contact service, please." << endl;
+			break;	
+		case 5:	
+			cout << "No money on balance." << endl;
+			pauseConsole();
+			break;					
+	}
 }
