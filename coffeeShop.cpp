@@ -1,16 +1,20 @@
 #include <iostream>
 #include <conio.h>
+#include<windows.h>
 using namespace std;
 #define MENU_CASES_NUM 4
 #define COFFEE_CASES_NUM 4
 #define ADMIN_CASES_NUM 5
 #define ENTER 13
 
-#define ESPRESSO_PRICE 2.50
-#define CAPPUCCINO_PRICE 1.60
-#define LATTE_PRICE 3.10
+#define ESPRESSO_PRICE 2
+#define CAPPUCCINO_PRICE 3
+#define LATTE_PRICE 3.20
 
 #define PIN 1234
+#define MAX_COUNT_PIN_INPUT 2
+
+#define SLEEP 100
 
 void showMainMenu(double userBalance);
 void showCoffeeMenu(double userBalance);
@@ -32,6 +36,14 @@ bool isPinValid(int pin);
 int addCups(int addedCups);
 bool isNumberAddedCupsCorrect(int addedCups);
 
+void showProgressBar();
+void showCursor(bool showCursor);
+
+void showNoCupsMessage(int cups);
+void showNotEnoughMoneyToBuyMessage(double userBalance, double price);
+void showShopBalance(double shopBalance);
+void showCupsNumber(int cups);
+
 int main()
 {
 	int cups = 7, addedCups = 0, pin = 0, countPinInput = 0, menuChoice, coffeeChoice, adminChoice;
@@ -47,7 +59,7 @@ int main()
 		{
 			case 1:
                 if(cups <= 0) {
-                    cout << "Sorry we don't have cups. Contact service, please." << endl;
+                    showNoCupsMessage(cups);
                 } else {
                     depositedMoney = depositeMoney(depositedMoney);
 
@@ -60,7 +72,6 @@ int main()
                     userBalance += depositedMoney;
                     shopBalance += depositedMoney;
                 }
-
                 break;
 			case 2:
 				coffeeMenu = true;
@@ -75,46 +86,43 @@ int main()
 						case 1:
 						    if(cups <= 0)
                             {
-                                cout << "Sorry we don't have cups. Contact service, please." << endl;
+                                showNoCupsMessage(cups);
                             } else if(isEnoughMoneyToBuy(userBalance, ESPRESSO_PRICE))
                             {
+                            	showProgressBar();
                                 userBalance -= ESPRESSO_PRICE;
                                 cups--;
-                                cout << "Take your ESPRESSO!" << endl;
                             } else
                             {
-                                cout << "Not enough money! Your balance: " << userBalance << ". Coffee price: " << ESPRESSO_PRICE << "." << endl;
-                                cout << "To buy, you need to deposit " << ESPRESSO_PRICE - userBalance << " BYN more" << endl;
+								showNotEnoughMoneyToBuyMessage(userBalance, ESPRESSO_PRICE);
                             }
 							break;
 						case 2:
                             if(cups <= 0)
                             {
-                                cout << "Sorry we don't have cups. Contact service, please." << endl;
+                                showNoCupsMessage(cups);
                             } else if(isEnoughMoneyToBuy(userBalance, CAPPUCCINO_PRICE))
                             {
+                            	showProgressBar();
                                 userBalance -= CAPPUCCINO_PRICE;
                                 cups--;
-                                cout << "Take your CAPPUCCINO!" << endl;
                             } else
                             {
-                                cout << "Not enough money! Your balance: " << userBalance << ". Coffee price: " << CAPPUCCINO_PRICE << "." << endl;
-                                cout << "To buy, you need to deposit " << CAPPUCCINO_PRICE - userBalance << " BYN more" << endl;
+                                showNotEnoughMoneyToBuyMessage(userBalance, CAPPUCCINO_PRICE);
                             }
                             break;
 						case 3:
                             if(cups <= 0)
                             {
-                                cout << "Sorry we don't have cups. Contact service, please." << endl;
+                                showNoCupsMessage(cups);
                             } else if(isEnoughMoneyToBuy(userBalance, LATTE_PRICE))
                             {
+                            	showProgressBar();
                                 userBalance -= LATTE_PRICE;
                                 cups--;
-                                cout << "Take your LATTE!" << endl;
                             } else
                             {
-                                cout << "Not enough money! Your balance: " << userBalance << ". Coffee price: " << LATTE_PRICE << "." << endl;
-                                cout << "To buy, you need to deposit " << LATTE_PRICE - userBalance << " BYN more" << endl;
+                                showNotEnoughMoneyToBuyMessage(userBalance, LATTE_PRICE);
                             }
 							break;
 						case 4:
@@ -130,15 +138,17 @@ int main()
 				pin = inputPIN(pin);
                 adminMenu = isPinValid(pin);
 
-                if(!adminMenu && countPinInput < 2)
+                if(!adminMenu && countPinInput < MAX_COUNT_PIN_INPUT)
                 {
                     cout << "PIN isn't correct!" << endl;
                     countPinInput++;
-                    cout << "You have " << 2 - countPinInput << " attempts." << endl;
+                    cout << "You have " << MAX_COUNT_PIN_INPUT - countPinInput << " attempts." << endl;
+                    pauseConsole();
                 }
-                if (countPinInput >= 2)
+                if (countPinInput >= MAX_COUNT_PIN_INPUT)
                 {
                     cout << "Coffee Shop is locked. Contact service, please." << endl;
+                    pauseConsole();
                     return 0;
                 }
 
@@ -150,14 +160,15 @@ int main()
 					switch(adminChoice)
 					{
 						case 1:
-						    cout << "Coffee shop balance: " << shopBalance << endl;
+						    showShopBalance(shopBalance);
 							break;
 						case 2:
-                            cout << "Current number of cups: " << cups << endl;
+                            showCupsNumber(cups);
 							break;
 						case 3:
 						    cout << shopBalance << " BYN was received." << endl;
                             shopBalance = 0;
+                            pauseConsole();
 							break;
 						case 4:
                             addedCups = addCups(addedCups);
@@ -241,7 +252,7 @@ void pauseConsole()
 
 void showUserBalance(double userBalance)
 {
-	cout << "Current balance: " << userBalance << endl;
+	cout << "Current balance: " << userBalance << " BYN" << endl;
 }
 
 int getChoice()
@@ -257,7 +268,7 @@ int getChoice()
 void showIncorrectChoiceMessage(int num)
 {
 	cout << "Incorrect input. Enter number 1..." << num << "!" << endl;
-	pause();
+	pauseConsole();
 }
 
 double depositeMoney(double sum)
@@ -311,4 +322,55 @@ bool isNumberAddedCupsCorrect(int addedCups)
     if (addedCups <= 0) {
         return false;
     } return true;
+}
+
+void showProgressBar()
+{	
+	showCursor(false);
+	char chars[] = "|/-\\";	
+		
+	for(int percent = 0, j = 0; percent <= 100; percent++)
+	{	
+		cout << "Cooking coffee! Progress [" << percent << "%] " << chars[j++] << "\r";
+		Sleep(SLEEP);
+		if(j == 4){	j = 0;}
+	}
+	
+	showCursor(true);
+	cout << "Coffee done! You can take it.    " << endl;
+	pauseConsole();
+}
+
+void showCursor(bool visible)
+{
+	void* handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO structCursorInfo;
+	GetConsoleCursorInfo(handle, &structCursorInfo);
+	structCursorInfo.bVisible = visible;
+	SetConsoleCursorInfo( handle, &structCursorInfo );	
+}
+
+void showNoCupsMessage(int cups)
+{
+	cout << "Sorry we don't have cups. Contact service, please." << endl;
+	pauseConsole();
+}
+
+void showNotEnoughMoneyToBuyMessage(double userBalance, double price)
+{
+    cout << "Not enough money to buy coffee!" << endl;
+    cout << "To buy, you need to deposit " << price - userBalance << " BYN more." << endl;	
+	pauseConsole();   
+}
+
+void showShopBalance(double shopBalance)
+{
+	cout << "Coffee shop balance: " << shopBalance << " BYN" << endl;
+	pauseConsole();
+}
+
+void showCupsNumber(int cups)
+{
+	cout << "Current number of cups: " << cups << endl;
+	pauseConsole();
 }
