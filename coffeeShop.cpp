@@ -12,7 +12,7 @@ using namespace std;
 #define LATTE_PRICE 3.20
 
 #define PIN 1234
-#define MAX_COUNT_PIN_INPUT 2
+#define MAX_COUNT_PIN_INPUT 3
 
 #define SLEEP 100
 
@@ -20,13 +20,11 @@ void showMainMenu(double userBalance);
 void showCoffeeMenu(double userBalance);
 void showAdminMenu();
 void pauseConsole();
-void showUserBalance(double userBalance);
-void showShopBalance(double shopBalance);
+void showBalance(double balance);
 void showCupsNumber(int cups);
 void showWithdrawMoneyMessage(double shopBalance);
 
 int getChoice();
-void showIncorrectChoiceMessage(int num);
 
 double depositeMoney(double userBalance);
 bool isDepositedMoneyCorrect(double depositedMoney);
@@ -43,9 +41,8 @@ bool isNumberAddedCupsCorrect(int addedCups);
 void showProgressBar();
 void showCursor(bool showCursor);
 
-void showNotEnoughMoneyToBuyMessage(double userBalance, double price);
-void showIncorrectPinMessage(int countPinInput);
 void showErrorMessage(int errorNum);
+void showErrorMessageWithParametr(int errorNum, double parametr);
 
 int main()
 {
@@ -96,7 +93,7 @@ int main()
                                 cups--;
                             } else
                             {
-								showNotEnoughMoneyToBuyMessage(userBalance, ESPRESSO_PRICE);
+								showErrorMessageWithParametr(1, ESPRESSO_PRICE);	
                             }
 							break;
 						case 2:
@@ -110,7 +107,7 @@ int main()
                                 cups--;
                             } else
                             {
-                                showNotEnoughMoneyToBuyMessage(userBalance, CAPPUCCINO_PRICE);
+                                showErrorMessageWithParametr(1, CAPPUCCINO_PRICE);
                             }
                             break;
 						case 3:
@@ -124,14 +121,14 @@ int main()
                                 cups--;
                             } else
                             {
-                                showNotEnoughMoneyToBuyMessage(userBalance, LATTE_PRICE);
+                                showErrorMessageWithParametr(1, LATTE_PRICE);
                             }
 							break;
 						case 4:
 							coffeeMenu = false;
 							break;				
 						default:
-							showIncorrectChoiceMessage(COFFEE_CASES_NUM);
+							showErrorMessageWithParametr(3, COFFEE_CASES_NUM);
 							break;		
 					}
 				}
@@ -145,12 +142,12 @@ int main()
                 	countPinInput++;
                     if (countPinInput >= MAX_COUNT_PIN_INPUT)
                     {
-                    	showIncorrectPinMessage(countPinInput);
+                    	showErrorMessageWithParametr(2, countPinInput);
                         showErrorMessage(4);
                         return 0;
                     }
 					
-					showIncorrectPinMessage(countPinInput);       
+					showErrorMessageWithParametr(2, countPinInput);     
                     pauseConsole();
                 }
 
@@ -162,7 +159,8 @@ int main()
 					switch(adminChoice)
 					{
 						case 1:
-						    showShopBalance(shopBalance);
+						    showBalance(shopBalance);
+						    pauseConsole();
 							break;
 						case 2:
                             showCupsNumber(cups);
@@ -191,7 +189,7 @@ int main()
 							adminMenu = false;
 							break;											
 						default:
-							showIncorrectChoiceMessage(ADMIN_CASES_NUM);
+							showErrorMessageWithParametr(3, ADMIN_CASES_NUM);
 							break;		
 					}
 				}
@@ -200,7 +198,7 @@ int main()
 				mainMenu = false;
 				break;				
 			default:
-				showIncorrectChoiceMessage(MENU_CASES_NUM);
+				showErrorMessageWithParametr(3, MENU_CASES_NUM);
 				break;		
 		}
 	}
@@ -214,7 +212,7 @@ void showMainMenu(double userBalance)
 	cout << "Welcome to CoffeeShop!" << endl;
 	cout << "The machine doesn't give change!" << endl;
 	cout << "------------------------" << endl;	
-	showUserBalance(userBalance);		
+	showBalance(userBalance);		
 	cout << "------------------------" << endl;	
 	cout << "1. Deposit money" << endl;	
 	cout << "2. Choose type of coffee" << endl;		
@@ -228,11 +226,11 @@ void showCoffeeMenu(double userBalance)
 	system("cls");
 	cout << "Types of coffee!" << endl;
 	cout << "--------------------" << endl;	
-	showUserBalance(userBalance);		
+	showBalance(userBalance);		
 	cout << "--------------------" << endl;
-	cout << "1. Espresso" << endl;
-	cout << "2. Cappuccino" << endl;
-	cout << "3. Latte" << endl;
+	cout << "1. Espresso  	  " << ESPRESSO_PRICE << " BYN" << endl;
+	cout << "2. Cappuccino	  " << CAPPUCCINO_PRICE << " BYN" << endl;
+	cout << "3. Latte     	" << LATTE_PRICE << " BYN" << endl;
 	cout << "4. Back to main menu" << endl;	
 	cout << "--------------------" << endl;		
 }
@@ -258,15 +256,9 @@ void pauseConsole()
 	} while (getch() != ENTER);	
 }
 
-void showUserBalance(double userBalance)
+void showBalance(double balance)
 {
-	cout << "Current balance: " << userBalance << " BYN" << endl;
-}
-
-void showShopBalance(double shopBalance)
-{
-	cout << "Coffee shop balance: " << shopBalance << " BYN" << endl;
-	pauseConsole();
+	cout << "Current balance: " << balance << " BYN" << endl;
 }
 
 void showCupsNumber(int cups)
@@ -289,12 +281,6 @@ int getChoice()
 	cin >> choice;
 	
 	return choice;
-}
-
-void showIncorrectChoiceMessage(int num)
-{
-	cout << "Incorrect input. Enter number 1..." << num << "!" << endl;
-	pauseConsole();
 }
 
 double depositeMoney(double sum)
@@ -381,18 +367,6 @@ void showCursor(bool visible)
 	SetConsoleCursorInfo( handle, &structCursorInfo );	
 }
 
-void showNotEnoughMoneyToBuyMessage(double userBalance, double price)
-{
-    cout << "Not enough money to buy coffee!" << endl;
-    cout << "To buy, you need to deposit " << price - userBalance << " BYN more." << endl;	
-	pauseConsole();   
-}
-
-void showIncorrectPinMessage(int countPinInput)
-{
-	cout << "PIN isn't correct! You have " << MAX_COUNT_PIN_INPUT - countPinInput << " attempts." << endl;
-}
-
 void showErrorMessage(int errorNum)
 {
 	switch(errorNum)
@@ -415,4 +389,23 @@ void showErrorMessage(int errorNum)
 			pauseConsole();
 			break;					
 	}
+}
+
+void showErrorMessageWithParametr(int errorNum, double parametr)
+{
+	switch(errorNum)
+	{
+		case 1:
+		    cout << "Not enough money to buy coffee!" << endl;
+		    cout << "To buy, you need to deposit " << parametr << " BYN more." << endl;	
+			pauseConsole();  
+			break;	
+		case 2:	
+			cout << "PIN isn't correct! You have " << MAX_COUNT_PIN_INPUT - parametr << " attempts." << endl;
+			break;
+		case 3:	
+			cout << "Incorrect input. Enter number 1..." << parametr << "!" << endl;
+			pauseConsole();
+			break;				
+	}	
 }
