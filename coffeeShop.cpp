@@ -3,6 +3,7 @@
 #include <windows.h>
 using namespace std;
 #define MENU_CASES_NUM 4
+#define DEPOSITE_MONEY_CASES_NUM 6
 #define COFFEE_CASES_NUM 4
 #define ADMIN_CASES_NUM 5
 #define ENTER 13
@@ -17,6 +18,7 @@ using namespace std;
 #define SLEEP 100
 
 void showMainMenu(double userBalance);
+void showDepositeMenu(double userBalance);
 void showCoffeeMenu(double userBalance);
 void showAdminMenu();
 void pauseConsole();
@@ -46,9 +48,9 @@ void showErrorMessageWithParametr(int errorNum, double parametr);
 
 int main()
 {
-	int cups = 7, addedCups = 0, pin = 0, countPinInput = 0, menuChoice, coffeeChoice, adminChoice;
+	int cups = 7, addedCups = 0, pin = 0, countPinInput = 0, menuChoice, depositeChoise, coffeeChoice, adminChoice;
 	double userBalance = 0.0, depositedMoney = 0.0, shopBalance = 0.0;
-	bool mainMenu = true, coffeeMenu, adminMenu;
+	bool mainMenu = true, depositeMenu, coffeeMenu, adminMenu;
 	
 	while(mainMenu)
 	{
@@ -61,15 +63,49 @@ int main()
                 if(cups <= 0) {
                     showErrorMessage(1);
                 } else {
-                    depositedMoney = depositeMoney(depositedMoney);
-
-                    while (!isDepositedMoneyCorrect(depositedMoney)) {
-                        showErrorMessage(2);
-                        depositedMoney = depositeMoney(depositedMoney);
-                    }
-
-                    userBalance += depositedMoney;
-                    shopBalance += depositedMoney;
+					depositeMenu = true;
+					
+					while(depositeMenu)
+					{
+						showDepositeMenu(userBalance);
+						depositeChoise = getChoice();
+						
+						switch(depositeChoise)
+						{
+							case 1:
+								userBalance += 0.10;
+                    			shopBalance += 0.10;
+                    			break;
+                    		
+                    		case 2:
+								userBalance += 0.20;
+                    			shopBalance += 0.20;
+                    			break;
+                    			
+                    		case 3:
+								userBalance += 0.50;
+                    			shopBalance += 0.50;
+                    			break;
+                    			
+                    		case 4:
+								userBalance += 1.0;
+                    			shopBalance += 1.0;
+                    			break;
+                    			
+                    		case 5:
+								userBalance += 2.0;
+                    			shopBalance += 2.0;
+                    			break;
+                    		
+                    		case 6:
+								depositeMenu = false;
+								break;
+                    			
+                    		default:
+							showErrorMessageWithParametr(3, DEPOSITE_MONEY_CASES_NUM);
+							break;
+						}
+					}
                 }
                 break;
 			case 2:
@@ -136,7 +172,9 @@ int main()
 			case 3:
 				pin = inputPIN(pin);
                 adminMenu = isPinValid(pin);
-
+				
+				if(pin == 0) break;
+				
                 if(!adminMenu)
                 {
                 	countPinInput++;
@@ -221,6 +259,22 @@ void showMainMenu(double userBalance)
 	cout << "------------------------" << endl;		
 }
 
+void showDepositeMenu(double userBalance)
+{
+	system("cls");
+	cout << "Deposite money!" << endl;
+	cout << "--------------------" << endl;	
+	showBalance(userBalance);		
+	cout << "--------------------" << endl;
+	cout << "1. 0.1 BYN" << endl;
+	cout << "2. 0.2 BYN" << endl;
+	cout << "3. 0.5 BYN" << endl;
+	cout << "4. 1.0 BYN" << endl;
+	cout << "5. 2.0 BYN" << endl;
+	cout << "6. Back to main menu" << endl;	
+	cout << "--------------------" << endl;		
+}
+
 void showCoffeeMenu(double userBalance)
 {
 	system("cls");
@@ -283,26 +337,9 @@ int getChoice()
 	return choice;
 }
 
-double depositeMoney(double sum)
-{
-    cout << "Deposit money: ";
-    cin >> sum;
-
-    return sum;
-}
-
-bool isDepositedMoneyCorrect(double depositedMoney)
-{
-    if(depositedMoney < 1) {
-        return false;
-    } return true;
-}
-
 bool isEnoughMoneyToBuy(double userBalance, double coffeePrice)
 {
-    if (coffeePrice > userBalance) {
-        return false;
-    } return true;
+    return coffeePrice <= userBalance;
 }
 
 double buyCoffee(double userBalance, double price)
@@ -312,7 +349,8 @@ double buyCoffee(double userBalance, double price)
 
 int inputPIN(int pin)
 {
-    cout << "Input PIN to enter service panel: ";
+    cout << "Input PIN to enter service panel ";
+    cout << "or 0 to return to main menu: ";
     cin >> pin;
 
     return pin;
@@ -320,10 +358,7 @@ int inputPIN(int pin)
 
 bool isPinValid(int pin)
 {
-    if(pin == PIN)
-    {
-        return true;
-    } return false;
+    return pin == PIN;
 }
 
 int addCups(int addedCups)
@@ -336,9 +371,7 @@ int addCups(int addedCups)
 
 bool isNumberAddedCupsCorrect(int addedCups)
 {
-    if (addedCups <= 0) {
-        return false;
-    } return true;
+    return addedCups > 0;
 }
 
 void showProgressBar()
