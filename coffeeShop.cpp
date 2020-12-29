@@ -2,9 +2,9 @@
 #include <conio.h>
 #include <windows.h>
 using namespace std;
-#define MENU_CASES_NUM 4
+#define MENU_CASES_NUM 6
 #define DEPOSITE_MONEY_CASES_NUM 6
-#define ADMIN_CASES_NUM 5
+#define ADMIN_CASES_NUM 3
 #define ENTER 13
 
 #define ESPRESSO_PRICE 2
@@ -18,7 +18,7 @@ using namespace std;
 
 void showMainMenu(double userBalance);
 void showDepositeMenu(double userBalance);
-void showAdminMenu();
+void showAdminMenu(double shopBalance, int cups);
 void pauseConsole();
 void showBalance(double balance);
 void showCupsNumber(int cups);
@@ -164,19 +164,12 @@ int main()
 
 				while(adminMenu)
 				{
-					showAdminMenu();
+					showAdminMenu(shopBalance, cups);
 					adminChoice = getChoice();
 					
 					switch(adminChoice)
 					{
 						case 1:
-						    showBalance(shopBalance);
-						    pauseConsole();
-							break;
-						case 2:
-                            showCupsNumber(cups);
-							break;
-						case 3:
 						    if(shopBalance == 0) {
 						        showErrorMessage(5);
 						    } else {
@@ -185,7 +178,7 @@ int main()
                                 userBalance = 0;
                             }
 							break;
-						case 4:
+						case 2:
                             addedCups = addCups(addedCups);
 
                             while(!isNumberAddedCupsCorrect(addedCups))
@@ -196,7 +189,7 @@ int main()
 
                             cups += addedCups;
 							break;
-						case 5:
+						case 3:
 							adminMenu = false;
 							break;											
 						default:
@@ -221,7 +214,6 @@ void showMainMenu(double userBalance)
 {
 	system("cls");
 	cout << "Welcome to CoffeeShop!" << endl;
-	cout << "The machine doesn't give change!" << endl;
 	cout << "------------------------" << endl;	
 	showBalance(userBalance);		
 	cout << "------------------------" << endl;	
@@ -238,29 +230,31 @@ void showDepositeMenu(double userBalance)
 {
 	system("cls");
 	cout << "Deposite money!" << endl;
-	cout << "--------------------" << endl;	
+	cout << "The machine doesn't give change!" << endl;
+	cout << "------------------------" << endl;	
 	showBalance(userBalance);		
-	cout << "--------------------" << endl;
+	cout << "------------------------" << endl;
 	cout << "1. 0.1 BYN" << endl;
 	cout << "2. 0.2 BYN" << endl;
 	cout << "3. 0.5 BYN" << endl;
 	cout << "4. 1.0 BYN" << endl;
 	cout << "5. 2.0 BYN" << endl;
 	cout << "6. Back to main menu" << endl;	
-	cout << "--------------------" << endl;		
+	cout << "------------------------" << endl;		
 }
 
-void showAdminMenu()
+void showAdminMenu(double shopBalance, int cups)
 {
 	system("cls");
 	cout << "Admin panel!" << endl;
-	cout << "--------------------------------" << endl;		
-	cout << "1. Show current balance" << endl;
-	cout << "2. Show current number of cups" << endl;
-	cout << "3. Take money from shop" << endl;	
-	cout << "4. Add cups" << endl;
-	cout << "5. Back to main menu" << endl;	
-	cout << "--------------------------------" << endl;			
+	cout << "------------------------" << endl;
+	showBalance(shopBalance);	
+	showCupsNumber(cups);	
+	cout << "------------------------" << endl;
+	cout << "1. Take money from shop" << endl;	
+	cout << "2. Add cups" << endl;
+	cout << "3. Back to main menu" << endl;	
+	cout << "------------------------" << endl;			
 }
 
 void pauseConsole()
@@ -278,8 +272,7 @@ void showBalance(double balance)
 
 void showCupsNumber(int cups)
 {
-	cout << "Current number of cups: " << cups << endl;
-	pauseConsole();
+	cout << "Current cups number: " << cups << endl;
 }
 
 void showWithdrawMoneyMessage(double shopBalance)
