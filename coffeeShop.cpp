@@ -4,7 +4,6 @@
 using namespace std;
 #define MENU_CASES_NUM 4
 #define DEPOSITE_MONEY_CASES_NUM 6
-#define COFFEE_CASES_NUM 4
 #define ADMIN_CASES_NUM 5
 #define ENTER 13
 
@@ -19,7 +18,6 @@ using namespace std;
 
 void showMainMenu(double userBalance);
 void showDepositeMenu(double userBalance);
-void showCoffeeMenu(double userBalance);
 void showAdminMenu();
 void pauseConsole();
 void showBalance(double balance);
@@ -48,9 +46,9 @@ void showErrorMessageWithParametr(int errorNum, double parametr);
 
 int main()
 {
-	int cups = 7, addedCups = 0, pin = 0, countPinInput = 0, menuChoice, depositeChoise, coffeeChoice, adminChoice;
+	int cups = 7, addedCups = 0, pin = 0, countPinInput = 0, menuChoice, depositeChoise, adminChoice;
 	double userBalance = 0.0, depositedMoney = 0.0, shopBalance = 0.0;
-	bool mainMenu = true, depositeMenu, coffeeMenu, adminMenu;
+	bool mainMenu = true, depositeMenu, adminMenu;
 	
 	while(mainMenu)
 	{
@@ -76,100 +74,75 @@ int main()
 								userBalance += 0.10;
                     			shopBalance += 0.10;
                     			break;
-                    		
                     		case 2:
 								userBalance += 0.20;
                     			shopBalance += 0.20;
                     			break;
-                    			
                     		case 3:
 								userBalance += 0.50;
                     			shopBalance += 0.50;
                     			break;
-                    			
                     		case 4:
 								userBalance += 1.0;
                     			shopBalance += 1.0;
                     			break;
-                    			
                     		case 5:
 								userBalance += 2.0;
                     			shopBalance += 2.0;
                     			break;
-                    		
                     		case 6:
 								depositeMenu = false;
 								break;
-                    			
                     		default:
-							showErrorMessageWithParametr(3, DEPOSITE_MONEY_CASES_NUM);
+								showErrorMessageWithParametr(3, DEPOSITE_MONEY_CASES_NUM);
 							break;
 						}
 					}
                 }
                 break;
 			case 2:
-				coffeeMenu = true;
-					
-				while(coffeeMenu)
-				{
-					showCoffeeMenu(userBalance);
-					coffeeChoice = getChoice();
-					
-					switch(coffeeChoice)
-					{
-						case 1:
-						    if(cups <= 0)
-                            {
-                                showErrorMessage(1);
-                            } else if(isEnoughMoneyToBuy(userBalance, ESPRESSO_PRICE))
-                            {
-                            	showProgressBar();
-                                userBalance = buyCoffee(userBalance, ESPRESSO_PRICE);
-                                cups--;
-                            } else
-                            {
-								showErrorMessageWithParametr(1, ESPRESSO_PRICE);	
-                            }
-							break;
-						case 2:
-                            if(cups <= 0)
-                            {
-                                showErrorMessage(1);
-                            } else if(isEnoughMoneyToBuy(userBalance, CAPPUCCINO_PRICE))
-                            {
-                            	showProgressBar();
-                                userBalance = buyCoffee(userBalance, CAPPUCCINO_PRICE);
-                                cups--;
-                            } else
-                            {
-                                showErrorMessageWithParametr(1, CAPPUCCINO_PRICE);
-                            }
-                            break;
-						case 3:
-                            if(cups <= 0)
-                            {
-                                showErrorMessage(1);
-                            } else if(isEnoughMoneyToBuy(userBalance, LATTE_PRICE))
-                            {
-                            	showProgressBar();
-                                userBalance = buyCoffee(userBalance, LATTE_PRICE);
-                                cups--;
-                            } else
-                            {
-                                showErrorMessageWithParametr(1, LATTE_PRICE);
-                            }
-							break;
-						case 4:
-							coffeeMenu = false;
-							break;				
-						default:
-							showErrorMessageWithParametr(3, COFFEE_CASES_NUM);
-							break;		
-					}
-				}
+				if(cups <= 0)
+                {
+                    showErrorMessage(1);
+                } else if(isEnoughMoneyToBuy(userBalance, ESPRESSO_PRICE))
+                {
+                	showProgressBar();
+                    userBalance = buyCoffee(userBalance, ESPRESSO_PRICE);
+                    cups--;
+                } else
+                {
+					showErrorMessageWithParametr(1, ESPRESSO_PRICE);	
+                }
 				break;
 			case 3:
+				if(cups <= 0)
+	            {
+	                showErrorMessage(1);
+	            } else if(isEnoughMoneyToBuy(userBalance, CAPPUCCINO_PRICE))
+	            {
+	            	showProgressBar();
+	                userBalance = buyCoffee(userBalance, CAPPUCCINO_PRICE);
+	                cups--;
+	            } else
+	            {
+	                showErrorMessageWithParametr(1, CAPPUCCINO_PRICE);
+	            }
+				break;
+			case 4:
+				if(cups <= 0)
+                {
+                    showErrorMessage(1);
+                } else if(isEnoughMoneyToBuy(userBalance, LATTE_PRICE))
+                {
+                	showProgressBar();
+                    userBalance = buyCoffee(userBalance, LATTE_PRICE);
+                    cups--;
+                } else
+                {
+                    showErrorMessageWithParametr(1, LATTE_PRICE);
+                }
+				break;
+			case 5:
 				pin = inputPIN(pin);
                 adminMenu = isPinValid(pin);
 				
@@ -232,7 +205,7 @@ int main()
 					}
 				}
 				break;
-			case 4:
+			case 6:
 				mainMenu = false;
 				break;				
 			default:
@@ -253,9 +226,11 @@ void showMainMenu(double userBalance)
 	showBalance(userBalance);		
 	cout << "------------------------" << endl;	
 	cout << "1. Deposit money" << endl;	
-	cout << "2. Choose type of coffee" << endl;		
-	cout << "3. Service" << endl;
-	cout << "4. Exit from shop" << endl;	
+	cout << "2. Espresso  	  " << ESPRESSO_PRICE << " BYN" << endl;
+	cout << "3. Cappuccino	  " << CAPPUCCINO_PRICE << " BYN" << endl;
+	cout << "4. Latte     	" << LATTE_PRICE << " BYN" << endl;	
+	cout << "5. Service" << endl;
+	cout << "6. Exit from shop" << endl;	
 	cout << "------------------------" << endl;		
 }
 
@@ -272,20 +247,6 @@ void showDepositeMenu(double userBalance)
 	cout << "4. 1.0 BYN" << endl;
 	cout << "5. 2.0 BYN" << endl;
 	cout << "6. Back to main menu" << endl;	
-	cout << "--------------------" << endl;		
-}
-
-void showCoffeeMenu(double userBalance)
-{
-	system("cls");
-	cout << "Types of coffee!" << endl;
-	cout << "--------------------" << endl;	
-	showBalance(userBalance);		
-	cout << "--------------------" << endl;
-	cout << "1. Espresso  	  " << ESPRESSO_PRICE << " BYN" << endl;
-	cout << "2. Cappuccino	  " << CAPPUCCINO_PRICE << " BYN" << endl;
-	cout << "3. Latte     	" << LATTE_PRICE << " BYN" << endl;
-	cout << "4. Back to main menu" << endl;	
 	cout << "--------------------" << endl;		
 }
 
