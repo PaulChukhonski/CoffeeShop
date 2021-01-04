@@ -28,9 +28,6 @@ void showWithdrawMoneyMessage(double shopBalance);
 
 int getChoice();
 
-double depositeMoney(double userBalance);
-bool isDepositedMoneyCorrect(double depositedMoney);
-
 bool isEnoughMoneyToBuy(double userBalance, double coffeePrice);
 double buyCoffee(double userBalance, double price);
 
