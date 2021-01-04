@@ -5,20 +5,22 @@ using namespace std;
 #define MENU_CASES_NUM 6
 #define DEPOSITE_MONEY_CASES_NUM 6
 #define ADMIN_CASES_NUM 3
+#define PIN_CASES_NUM 2
 #define ENTER 13
 
-#define ESPRESSO_PRICE 2
-#define CAPPUCCINO_PRICE 3
-#define LATTE_PRICE 3.20
+#define ESPRESSO_PRICE 1
+#define CAPPUCCINO_PRICE 1.5
+#define LATTE_PRICE 1.5
 
 #define PIN 1234
 #define MAX_COUNT_PIN_INPUT 3
 
-#define SLEEP 100
+#define SLEEP 50
 
 void showMainMenu(double userBalance);
 void showDepositeMenu(double userBalance);
 void showAdminMenu(double shopBalance, int cups);
+void showPinMenu();
 void pauseConsole();
 void showBalance(double balance);
 void showCupsNumber(int cups);
@@ -46,9 +48,9 @@ void showErrorMessageWithParametr(int errorNum, double parametr);
 
 int main()
 {
-	int cups = 7, addedCups = 0, pin = 0, countPinInput = 0, menuChoice, depositeChoise, adminChoice;
-	double userBalance = 0.0, depositedMoney = 0.0, shopBalance = 0.0;
-	bool mainMenu = true, depositeMenu, adminMenu;
+	int cups = 7, addedCups = 0, pin = 0, countPinInput = 0, menuChoice, depositeChoise, adminChoice, pinChoice;
+	double userBalance = 0.0, shopBalance = 0.0;
+	bool mainMenu = true, depositeMenu, adminMenu, pinMenu;
 	
 	while(mainMenu)
 	{
@@ -111,7 +113,7 @@ int main()
                     cups--;
                 } else
                 {
-					showErrorMessageWithParametr(1, ESPRESSO_PRICE);	
+					showErrorMessageWithParametr(1, ESPRESSO_PRICE - userBalance);	
                 }
 				break;
 			case 3:
@@ -125,7 +127,7 @@ int main()
 	                cups--;
 	            } else
 	            {
-	                showErrorMessageWithParametr(1, CAPPUCCINO_PRICE);
+	                showErrorMessageWithParametr(1, CAPPUCCINO_PRICE - userBalance);
 	            }
 				break;
 			case 4:
@@ -139,61 +141,79 @@ int main()
                     cups--;
                 } else
                 {
-                    showErrorMessageWithParametr(1, LATTE_PRICE);
+                    showErrorMessageWithParametr(1, LATTE_PRICE - userBalance);
                 }
 				break;
 			case 5:
-				pin = inputPIN(pin);
-                adminMenu = isPinValid(pin);
+				pinMenu = true;
 				
-				if(pin == 0) break;
-				
-                if(!adminMenu)
-                {
-                	countPinInput++;
-                    if (countPinInput >= MAX_COUNT_PIN_INPUT)
-                    {
-                    	showErrorMessageWithParametr(2, countPinInput);
-                        showErrorMessage(4);
-                        return 0;
-                    }
-					
-					showErrorMessageWithParametr(2, countPinInput);     
-                    pauseConsole();
-                }
-
-				while(adminMenu)
+				while(pinMenu)
 				{
-					showAdminMenu(shopBalance, cups);
-					adminChoice = getChoice();
+					showPinMenu();
+					pinChoice = getChoice();
 					
-					switch(adminChoice)
+					switch(pinChoice)
 					{
 						case 1:
-						    if(shopBalance == 0) {
-						        showErrorMessage(5);
-						    } else {
-                                showWithdrawMoneyMessage(shopBalance);
-                                shopBalance = 0;
-                                userBalance = 0;
-                            }
-							break;
+							pin = inputPIN(pin);
+		                	adminMenu = isPinValid(pin);
+		                	
+							if(!adminMenu)
+			                {
+			                	countPinInput++;
+			                    if (countPinInput >= MAX_COUNT_PIN_INPUT)
+			                    {
+			                    	showErrorMessageWithParametr(2, countPinInput);
+			                        showErrorMessage(4);
+			                        return 0;
+			                    }
+								
+								showErrorMessageWithParametr(2, countPinInput);     
+			                    pauseConsole();
+			                }
+			
+							while(adminMenu)
+							{
+								showAdminMenu(shopBalance, cups);
+								adminChoice = getChoice();
+								
+								switch(adminChoice)
+								{
+									case 1:
+									    if(shopBalance == 0) {
+									        showErrorMessage(5);
+									    } else {
+			                                showWithdrawMoneyMessage(shopBalance);
+			                                shopBalance = 0;
+			                                userBalance = 0;
+			                            }
+										break;
+									case 2:
+			                            addedCups = addCups(addedCups);
+			
+			                            while(!isNumberAddedCupsCorrect(addedCups))
+			                            {
+			                            	showErrorMessage(3);
+			                                addedCups = addCups(addedCups);
+			                            }
+			
+			                            cups += addedCups;
+										break;
+									case 3:
+										adminMenu = false;
+										pinMenu = false;
+										break;											
+									default:
+										showErrorMessageWithParametr(3, ADMIN_CASES_NUM);
+										break;		
+								}
+							}
+							break;						
 						case 2:
-                            addedCups = addCups(addedCups);
-
-                            while(!isNumberAddedCupsCorrect(addedCups))
-                            {
-                            	showErrorMessage(3);
-                                addedCups = addCups(addedCups);
-                            }
-
-                            cups += addedCups;
-							break;
-						case 3:
-							adminMenu = false;
-							break;											
+							pinMenu = false;
+							break;												
 						default:
-							showErrorMessageWithParametr(3, ADMIN_CASES_NUM);
+							showErrorMessageWithParametr(3, PIN_CASES_NUM);
 							break;		
 					}
 				}
@@ -218,9 +238,9 @@ void showMainMenu(double userBalance)
 	showBalance(userBalance);		
 	cout << "------------------------" << endl;	
 	cout << "1. Deposit money" << endl;	
-	cout << "2. Espresso  	  " << ESPRESSO_PRICE << " BYN" << endl;
-	cout << "3. Cappuccino	  " << CAPPUCCINO_PRICE << " BYN" << endl;
-	cout << "4. Latte     	" << LATTE_PRICE << " BYN" << endl;	
+	cout << "2. Espresso  	   " << ESPRESSO_PRICE << " BYN" << endl;
+	cout << "3. Cappuccino	 " << CAPPUCCINO_PRICE << " BYN" << endl;
+	cout << "4. Latte     	 " << LATTE_PRICE << " BYN" << endl;	
 	cout << "5. Service" << endl;
 	cout << "6. Exit from shop" << endl;	
 	cout << "------------------------" << endl;		
@@ -254,6 +274,16 @@ void showAdminMenu(double shopBalance, int cups)
 	cout << "1. Take money from shop" << endl;	
 	cout << "2. Add cups" << endl;
 	cout << "3. Back to main menu" << endl;	
+	cout << "------------------------" << endl;			
+}
+
+void showPinMenu()
+{
+	system("cls");
+	cout << "Pin confirmation!" << endl;
+	cout << "------------------------" << endl;	
+	cout << "1. Enter pin" << endl;	
+	cout << "2. Exit to main menu" << endl;
 	cout << "------------------------" << endl;			
 }
 
@@ -303,8 +333,7 @@ double buyCoffee(double userBalance, double price)
 
 int inputPIN(int pin)
 {
-    cout << "Input PIN to enter service panel ";
-    cout << "or 0 to return to main menu: ";
+    cout << "Input PIN to enter service panel: ";
     cin >> pin;
 
     return pin;
